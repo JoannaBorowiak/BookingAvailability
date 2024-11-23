@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace BookingAvailability.Models
 {
-    internal class Booking
+    public class Booking
     {
-        public string HotelId { get; set; }
-        public string Arrival { get; set; }
-        public string Departure { get; set; }
-        public string RoomType { get; set; }
-        public string RoomRate { get; set; }
+        public string hotelId { get; set; }
+        public string arrival { get; set; }
+        public string departure { get; set; }
+        public string roomType { get; set; }
+        public string roomRate { get; set; }
     }
 }
