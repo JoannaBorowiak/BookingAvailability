@@ -10,7 +10,25 @@ class Program
         List<Hotel> hotels = LoadHotels(@"..\..\..\hotels.json");
         List<Booking> bookings = LoadBookings(@"..\..\..\bookings.json");
 
-        ParseInput("Availability(H1, 20240901, SGL) ");
+        Console.WriteLine("The system is ready. Write what you want to do?");
+        Console.WriteLine("Available comands are: Availability");
+
+        do
+        {
+            string input = Console.ReadLine();
+            if (input == null) break;
+            (string hotelId, string roomType, string arrivalDate, string departureDate) = ParseInput(input);
+
+            switch (input.Substring(0, input.IndexOf("(")))
+            {
+                case "Availability":
+                    CheckAvailability(hotels, bookings, hotelId, roomType, arrivalDate, departureDate);
+                    break;
+                case "Book":
+                    Console.WriteLine("This feature is unvailable yet!");
+                    break;
+            }
+        } while (true);
     }
     static List<Hotel> LoadHotels(string filePath)
     {
@@ -36,7 +54,7 @@ class Program
         Match match = Regex.Match(question, pattern);
         if (match.Success)
         {
-            string[] data = match.Groups[1].Value.Split(",");
+            string[] data = match.Groups[1].Value.ToUpper().Split(",");
 
             string[] dates = data[1].Split("-");
 
@@ -56,5 +74,84 @@ class Program
     {
         var newDate = DateTime.ParseExact(date, "yyyyMMdd", CultureInfo.InvariantCulture);
         return newDate;
+    }
+
+    static Hotel CheckHotelAvailability(List<Hotel> hotels, string hotelId)
+    {
+        Hotel foundHotel = null;
+        foreach (var hotel in hotels)
+        {
+            if (hotel.id == hotelId)
+            {
+                foundHotel = hotel;
+            }
+        }
+        return foundHotel;
+    }
+    static bool CheckRoomTypesInHotel(List<Hotel> hotels, string hotelId, string roomType, Hotel foundHotel)
+    {
+        bool roomTypeExist = false;
+        foreach (var roomTypeHotel in foundHotel.roomTypes)
+        {
+            if (roomTypeHotel.code == roomType)
+            {
+                roomTypeExist = true;
+            }
+        }
+        if (!roomTypeExist)
+        {
+            Console.WriteLine($"Room type {roomType} doesn't exist in hotel {foundHotel}");
+        }
+        return roomTypeExist;
+    }
+    //Countings rooms
+    static int CountingsRoomsTypeInHotel(List<Hotel> hotels, string hotelId, string roomType, Hotel foundHotel)
+    {
+        int roomCount = 0;
+        foreach (Room room in foundHotel.rooms)
+        {
+            if (room.roomType == roomType)
+            {
+                roomCount++;
+            }
+        }
+        return roomCount;
+    }
+
+    static void CheckAvailability(List<Hotel> hotels, List<Booking> bookings, string hotelId, string roomType, string arrivalDate, string departureDate)
+    {
+        Hotel foundHotel = CheckHotelAvailability(hotels, hotelId);
+        if (foundHotel == null)
+        {
+            Console.WriteLine($"Hotel {hotelId} doesn't exist");
+        }
+        if (!CheckRoomTypesInHotel(hotels, hotelId, roomType, foundHotel))
+        {
+            Console.WriteLine($"Hotel {hotelId} doesn't have rooms of type {roomType}");
+        }
+        else
+        {
+        int roomCount = CountingsRoomsTypeInHotel(hotels, hotelId, roomType, foundHotel);
+            foreach (Booking booking in bookings)
+            {
+                //Arrival after reservation start
+                bool arrivalAfterBookingArrival = ConvertStringToDate(arrivalDate) >= ConvertStringToDate(booking.arrival);
+                //Arrival before reservation end
+                bool arrivalBeforeBookingDeparture = ConvertStringToDate(arrivalDate) < ConvertStringToDate(booking.departure);
+                //Departure after reservation start
+                bool departureAfterBookingArrival = ConvertStringToDate(departureDate) > ConvertStringToDate(booking.arrival);
+                //Departure before reservation end
+                bool departureBeforeBookingDeparture = ConvertStringToDate(departureDate) <= ConvertStringToDate(booking.departure);
+                bool unavaible = (arrivalAfterBookingArrival && arrivalBeforeBookingDeparture) || (departureAfterBookingArrival && departureBeforeBookingDeparture);
+
+                if (hotelId == booking.hotelId && roomType == booking.roomType && unavaible)
+                {
+                    roomCount--;
+                }
+            }
+            if (roomCount > 0) Console.WriteLine($"Number of available rooms: {roomCount}");
+            else if (roomCount == 0) Console.WriteLine($"No rooms of type {roomType} available in hotel {hotelId}");
+            else Console.WriteLine($"{roomType} rooms are currently overbooked");
+        }
     }
 }
