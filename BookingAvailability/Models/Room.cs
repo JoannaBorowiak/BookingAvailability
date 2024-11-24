@@ -2,7 +2,7 @@
 {
     public class Room
     {
-        public string roomType { get; set; }
-        public string roomId {  get; set; }
+        public required string roomType { get; set; }
+        public required string roomId {  get; set; }
     }
 }
