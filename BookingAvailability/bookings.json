@@ -12,19 +12,5 @@
         "departure": "20240905",
         "roomType": "SGL",
         "roomRate": "Standard"
-    },
-    {
-        "hotelId": "H1",
-        "arrival": "20240902",
-        "departure": "20240905",
-        "roomType": "SGL",
-        "roomRate": "Standard"
-    },
-    {
-        "hotelId": "H1",
-        "arrival": "20240902",
-        "departure": "20240905",
-        "roomType": "SGL",
-        "roomRate": "Standard"
     }
 ] 

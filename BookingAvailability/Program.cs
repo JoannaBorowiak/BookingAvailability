@@ -31,17 +31,18 @@ namespace BookingAvailability
                 //Main program loop
                 while (true)
                 {
-                    string? input = Console.ReadLine();
-                    if (input == null) break;
+                    string ?input = Console.ReadLine();
+                    //If input is empty then break program loop
+                    if (input == "" || input == null) break;
                     try 
                     {
                         (string hotelId, string roomType, string arrivalDate, string departureDate) = ParseInput(input);
-                        switch (input.Substring(0, input.IndexOf('(')))
+                        switch (input.ToLower()[..input.IndexOf('(')])
                         {
-                            case "Availability":
+                            case "availability":
                                 CheckAvailability(hotels, bookings, hotelId, roomType, arrivalDate, departureDate);
                                 break;
-                            case "Book":
+                            case "book":
                                 Console.WriteLine("This feature is unvailable yet!");
                                 break;
                             default:
@@ -193,11 +194,12 @@ namespace BookingAvailability
             Hotel ?foundHotel = CheckHotelPresent(hotels, hotelId);
             if (foundHotel == null)
             {
-                Console.WriteLine($"Hotel {hotelId} doesn't exist");
+                throw new ArgumentException($"Hotel {hotelId} doesn't exist");
             }
             else if (!CheckRoomTypesInHotel( roomType, foundHotel))
             {
-                Console.WriteLine($"Hotel {hotelId} doesn't have rooms of type {roomType}");
+
+                throw new ArgumentException($"Hotel {hotelId} doesn't have rooms of type {roomType}");
             }
             else
             {
@@ -222,8 +224,7 @@ namespace BookingAvailability
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine("Wrong date format!");
-                        return;
+                        throw new ArgumentException("Wrong date format!");
                     }
                 }
                 if (roomCount > 0) Console.WriteLine($"Number of available rooms: {roomCount}");
