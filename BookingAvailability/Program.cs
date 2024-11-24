@@ -6,11 +6,19 @@ namespace BookingAvailability
 {
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
+            string hotelsPath = @"..\..\..\hotels.json";
+            string bookingsPath = @"..\..\..\bookings.json";
+            if (args.Length>0)
+            {
+                hotelsPath = args[0];
+                bookingsPath = args[1];
+            }
+              
             //Load data from json files
-            List<Hotel> ?hotels = LoadHotels(@"..\..\..\hotels.json");
-            List<Booking> ?bookings = LoadBookings(@"..\..\..\bookings.json");
+            List<Hotel> ?hotels = LoadHotels(hotelsPath);
+            List<Booking> ?bookings = LoadBookings(bookingsPath);
             
             if (hotels == null || bookings == null)
             {
@@ -25,16 +33,26 @@ namespace BookingAvailability
                 {
                     string? input = Console.ReadLine();
                     if (input == null) break;
-                    (string hotelId, string roomType, string arrivalDate, string departureDate) = ParseInput(input);
-
-                    switch (input.Substring(0, input.IndexOf('(')))
+                    try 
                     {
-                        case "Availability":
-                            CheckAvailability(hotels, bookings, hotelId, roomType, arrivalDate, departureDate);
-                            break;
-                        case "Book":
-                            Console.WriteLine("This feature is unvailable yet!");
-                            break;
+                        (string hotelId, string roomType, string arrivalDate, string departureDate) = ParseInput(input);
+                        switch (input.Substring(0, input.IndexOf('(')))
+                        {
+                            case "Availability":
+                                CheckAvailability(hotels, bookings, hotelId, roomType, arrivalDate, departureDate);
+                                break;
+                            case "Book":
+                                Console.WriteLine("This feature is unvailable yet!");
+                                break;
+                            default:
+                                Console.WriteLine("This feature is unknown!");
+                                break;
+                        }
+                    }
+                    catch(Exception e) 
+                    {
+                        Console.WriteLine(e.Message);
+                        continue;
                     }
                 }
             }
@@ -74,13 +92,18 @@ namespace BookingAvailability
         /// Parses string input to string variables
         /// </summary>
         /// <returns>Tupple of four strings</returns>
-        static (string, string, string, string) ParseInput(string question)
+        static public (string, string, string, string) ParseInput(string question)
         {
             string pattern = @"\(([^)]+)\)";
             Match match = Regex.Match(question, pattern);
             if (match.Success)
             {
                 string[] data = match.Groups[1].Value.ToUpper().Split(",");
+
+                if (data.Length != 3)
+                {
+                    throw new ArgumentException("This function takes exactly 3 arguments!");
+                }
 
                 string[] dates = data[1].Split("-");
 
@@ -89,6 +112,10 @@ namespace BookingAvailability
 
                 string arrivalDate = dates[0].Trim();
                 string departureDate = dates.Length > 1 ? dates[1].Trim() : arrivalDate;
+                if (ConvertStringToDate(arrivalDate) > ConvertStringToDate(departureDate))
+                {
+                    throw new ArgumentException("Departure date can't be before arrival date!");
+                }
                 return (hotelId, roomType, arrivalDate, departureDate);
             }
             else
@@ -138,10 +165,6 @@ namespace BookingAvailability
                     roomTypeExist = true;
                 }
             }
-            if (!roomTypeExist)
-            {
-                Console.WriteLine($"Room type {roomType} doesn't exist in hotel {foundHotel}");
-            }
             return roomTypeExist;
         }
 
@@ -181,19 +204,26 @@ namespace BookingAvailability
                 int roomCount = CountingsRoomsOfTypeInHotel(roomType, foundHotel);
                 foreach (Booking booking in bookings)
                 {
-                    //Arrival after reservation start
-                    bool arrivalAfterBookingArrival = ConvertStringToDate(arrivalDate) >= ConvertStringToDate(booking.arrival);
-                    //Arrival before reservation end
-                    bool arrivalBeforeBookingDeparture = ConvertStringToDate(arrivalDate) < ConvertStringToDate(booking.departure);
-                    //Departure after reservation start
-                    bool departureAfterBookingArrival = ConvertStringToDate(departureDate) > ConvertStringToDate(booking.arrival);
-                    //Departure before reservation end
-                    bool departureBeforeBookingDeparture = ConvertStringToDate(departureDate) <= ConvertStringToDate(booking.departure);
-                    bool unavaible = (arrivalAfterBookingArrival && arrivalBeforeBookingDeparture) || (departureAfterBookingArrival && departureBeforeBookingDeparture);
-
-                    if (hotelId == booking.hotelId && roomType == booking.roomType && unavaible)
+                    try
                     {
-                        roomCount--;
+                        //Arrival after reservation start
+                        bool arrivalAfterBookingArrival = ConvertStringToDate(arrivalDate) >= ConvertStringToDate(booking.arrival);
+                        //Arrival before reservation end
+                        bool arrivalBeforeBookingDeparture = ConvertStringToDate(arrivalDate) < ConvertStringToDate(booking.departure);
+                        //Departure after reservation start
+                        bool departureAfterBookingArrival = ConvertStringToDate(departureDate) > ConvertStringToDate(booking.arrival);
+                        //Departure before reservation end
+                        bool departureBeforeBookingDeparture = ConvertStringToDate(departureDate) <= ConvertStringToDate(booking.departure);
+                        bool unavaible = (arrivalAfterBookingArrival && arrivalBeforeBookingDeparture) || (departureAfterBookingArrival && departureBeforeBookingDeparture);
+                        if (hotelId == booking.hotelId && roomType == booking.roomType && unavaible)
+                        {
+                            roomCount--;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Wrong date format!");
+                        return;
                     }
                 }
                 if (roomCount > 0) Console.WriteLine($"Number of available rooms: {roomCount}");
