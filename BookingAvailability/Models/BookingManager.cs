@@ -22,9 +22,9 @@ public class BookingManager
     public bool IsRoomAvailable(string hotelId, string roomType, DateTime arrival, DateTime departure)
     {
         return !Bookings.Any(b =>
-            b.hotelId == hotelId &&
-            b.roomType == roomType &&
-            arrival < DateTime.ParseExact(b.departure, "yyyyMMdd", null) &&
-            departure > DateTime.ParseExact(b.arrival, "yyyyMMdd", null));
+            b.HotelId == hotelId &&
+            b.RoomType == roomType &&
+            arrival < DateTime.ParseExact(b.Departure, "yyyyMMdd", null) &&
+            departure > DateTime.ParseExact(b.Arrival, "yyyyMMdd", null));
     }
 }

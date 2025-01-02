@@ -17,8 +17,8 @@ public class InputParser
                 throw new ArgumentException("This function takes exactly 3 arguments!");
             }
 
-            string hotelId = data[0].Trim();
-            string roomType = data[2].Trim();
+            string hotelId = data[0].Trim().ToUpper();
+            string roomType = data[2].Trim().ToUpper();
             string[] dates = data[1].Split("-");
 
             DateTime arrival = DateTime.ParseExact(dates[0].Trim(), "yyyyMMdd", CultureInfo.InvariantCulture);

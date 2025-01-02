@@ -1,10 +1,16 @@
-﻿namespace BookingAvailability.Models
+﻿using System.Text.Json.Serialization;
+
+namespace BookingAvailability.Models
 {
     public class Hotel
     {
-        public string id {  get; set; }
-        public string name { get; set; }
-        public List<RoomType> roomTypes { get; set; }
-        public List<Room> rooms { get; set; }
+        [JsonPropertyName("id")]
+        public required string Id {  get; set; }
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
+        [JsonPropertyName("roomTypes")]
+        public required List<RoomType> RoomTypes { get; set; }
+        [JsonPropertyName("rooms")]
+        public required List<Room> Rooms { get; set; }
     }
 }

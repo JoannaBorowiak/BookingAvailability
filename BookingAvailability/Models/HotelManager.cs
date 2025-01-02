@@ -21,17 +21,17 @@ public class HotelManager
 
     public Hotel? GetHotelById(string hotelId)
     {
-        return Hotels.FirstOrDefault(h => h.id == hotelId);
+        return Hotels.FirstOrDefault(h => h.Id == hotelId);
     }
 
     public bool IsRoomTypeInHotel(Hotel hotel, string roomType)
     {
-        return hotel.roomTypes.Any(rt => rt.code == roomType);
+        return hotel.RoomTypes.Any(rt => rt.Code == roomType);
     }
 
     public int GetRoomCountByType(Hotel hotel, string roomType)
     {
-        return hotel.rooms.Count(r => r.roomType == roomType);
+        return hotel.Rooms.Count(r => r.RoomType == roomType);
     }
 }
 
