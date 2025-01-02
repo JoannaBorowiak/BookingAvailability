@@ -47,12 +47,7 @@ Ensure you have:
     ```scss
     Availability(H1, 20240101-20240103, DBL)
     ```
-## Running Tests
-You can test the program interactively by providing different JSON files and running commands in the CLI. For automated tests, implement unit tests for key methods like CheckAvailability, ParseInput, and LoadHotels using a test framework such as xUnit or NUnit. Run automated tests with:
 
-```bash
-dotnet test
-```
 ## Error Handling
 - **Invalid File Paths**: The program will notify you if the hotels.json or bookings.json file cannot be found.
 - **Invalid Input Format**: Commands that do not match the required format (e.g., incorrect date format or missing arguments) will produce an error message.
