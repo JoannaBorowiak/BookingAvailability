@@ -13,7 +13,7 @@ This program allows you to check room availability in a hotel based on provided 
 ### Prerequisites
 
 Ensure you have:
-- **.NET 6.0 SDK or later** installed on your system.
+- **.NET 8.0 SDK or later** installed on your system.
 - Valid JSON files: `hotels.json` and `bookings.json`.
 
 ### Running the Program
